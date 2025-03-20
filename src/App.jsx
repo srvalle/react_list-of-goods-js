@@ -21,13 +21,18 @@ const SORT_FIELD_LENGTH = 'length';
 function getPreparedGoods(goods, sortField, isReversed) {
   const preparedGoods = [...goods];
 
-  if (sortField === SORT_FIELD_ALPHABETICALLY) {
-    preparedGoods.sort((a, b) => a.localeCompare(b));
-  }
+  const compare = (a, b) => {
+    switch (sortField) {
+      case SORT_FIELD_ALPHABETICALLY:
+        return a.localeCompare(b);
+      case SORT_FIELD_LENGTH:
+        return a.length - b.length;
+      default:
+        return 0;
+    }
+  };
 
-  if (sortField === SORT_FIELD_LENGTH) {
-    preparedGoods.sort((a, b) => a.length - b.length);
-  }
+  preparedGoods.sort(compare);
 
   if (isReversed) {
     preparedGoods.reverse();
@@ -42,10 +47,6 @@ export const App = () => {
   const [goods] = useState([...goodsFromServer]);
 
   const visibleGoods = getPreparedGoods(goods, sortField, isReversed);
-
-  const toggleReverse = () => {
-    setIsReversed(prev => !prev);
-  };
 
   return (
     <div className="section content">
@@ -75,7 +76,7 @@ export const App = () => {
         </button>
 
         <button
-          onClick={toggleReverse}
+          onClick={() => setIsReversed(prev => !prev)}
           className={
             isReversed ? 'button is-warning' : 'button is-warning is-light'
           }
